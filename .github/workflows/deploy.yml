@@ -9,26 +9,23 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write    # Needed so actions can update gh-pages branch
-
     steps:
-      - name: Checkout Repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Flutter
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "stable"
+          flutter-version: 'stable'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Flutter Web
+      - name: Build Flutter web
         run: flutter build web --release --base-href "/food_hub/"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          publish_dir: ./build/web
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/web
