@@ -1,4 +1,4 @@
-name: Deploy Flutter Web to GitHub Pages
+name: Set up Flutter
 
 on:
   push:
