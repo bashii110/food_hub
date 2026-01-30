@@ -15,7 +15,7 @@ dependencies:
 
 
   # Image picker
-  image_picker: ^1.1.1
+  image_picker: 1.0.8
 
   # Local Storage
   hive: ^2.2.3
