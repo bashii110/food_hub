@@ -1,191 +1,350 @@
-# FoodHub - Flutter Food Ordering App
-Check Live:  https://bashii110.github.io/food_hub/
+<div align="center">
 
+<img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" />
+<img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" />
+<img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" />
+<img src="https://img.shields.io/badge/Riverpod-0175C2?style=for-the-badge&logo=dart&logoColor=white" />
+<img src="https://img.shields.io/badge/Hive-FFA726?style=for-the-badge&logo=hive&logoColor=white" />
 
-**FoodHub** is a Flutter-based mobile application for food ordering and delivery management. It supports **user registration, login, profile management, browsing products, order management, and payment handling**. The app also has a complete **Admin Panel** to manage orders, products, users, and dashboard analytics.
+<br/><br/>
 
----
+<h1>🍔 FoodHub</h1>
 
-## 📱 Features
+<p><strong>A full-stack Flutter food ordering app with a powerful Admin Panel — built for speed, simplicity, and scale.</strong></p>
 
-### User Features
-- User registration, login, and logout
-- Profile management (view and update)
-- Browse food products by categories
-- Place orders with multiple payment methods
-- Upload payment proof for verification
-- View order history and status updates
-- Smooth and responsive UI with light/dark theme support
+<p>
+  <a href="https://bashii110.github.io/food_hub/"><img src="https://img.shields.io/badge/🌐%20Live%20Demo-Click%20Here-brightgreen?style=flat-square" /></a>
+  &nbsp;
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/Status-Active%20Development-brightgreen" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/Theme-Light%20%2F%20Dark-blueviolet" />
+</p>
 
-### Admin Features
-- Admin login and dashboard
-- Overview of total orders, revenue, users, and products
-- Manage orders, including verifying payments and tracking status
-- Manage products (CRUD operations)
-- Manage users (view all users, roles, and activity)
-- Dashboard analytics with revenue charts and recent orders
-- Responsive admin layout for desktop and tablets
+<br/>
 
-### Payment Features
-- Multiple payment options (JazzCash, Easypaisa, Bank Transfer, Cash on Delivery)
-- Upload payment proof and view verification status
-- Admin verification with approval/rejection
+```
+Browse food. Place orders. Pay your way. All in one place.
+```
 
-### Theme & UI
-- Supports **light and dark mode**
-- All colors are dynamic and follow the app theme
-- Modern UI with `NavigationRail` for admin panel and responsive layouts
-- Refreshable dashboard with real-time stats
+</div>
 
 ---
 
-## 🛠 Tech Stack
+## 📋 Table of Contents
 
-- **Frontend:** Flutter, Riverpod (state management)
-- **Backend:** Laravel (REST API)
-- **Database:** MySQL
-- **Local Storage:** Hive (for theme and settings)
-- **Networking:** `http` and custom API client
-- **State Management:** Riverpod (`StateNotifierProvider`, `FutureProvider`)
-- **Other Packages:** 
-  - `flutter_riverpod`
-  - `hive_flutter`
-  - `cached_network_image`
+- [✨ Features](#-features)
+- [📱 Screenshots](#-screenshots)
+- [🏗️ Architecture](#️-architecture)
+- [🗂️ Project Structure](#️-project-structure)
+- [📦 State Management](#-state-management)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🚀 Getting Started](#-getting-started)
+- [⚡ Backend Setup](#-backend-setup)
+- [🤝 Contributing](#-contributing)
 
 ---
+
+## ✨ Features
+
+### 🧑‍🍳 For Users
+| Feature | Description |
+|--------|-------------|
+| 🔐 **Auth** | Register, login, and logout with secure sessions |
+| 👤 **Profile** | View and update personal information |
+| 🍕 **Browse** | Explore food products by categories |
+| 🛒 **Ordering** | Place orders with real-time status tracking |
+| 💳 **Payments** | JazzCash, Easypaisa, Bank Transfer, Cash on Delivery |
+| 📸 **Proof Upload** | Upload payment screenshots for verification |
+| 📜 **History** | Full order history with live status updates |
+
+### 🛡️ For Admins
+| Feature | Description |
+|--------|-------------|
+| 📊 **Dashboard** | Overview of revenue, orders, users, and products |
+| 📦 **Order Management** | Verify payments, approve/reject, track status |
+| 🍔 **Product CRUD** | Add, edit, delete, and manage all food items |
+| 👥 **User Management** | View all users, roles, and activity |
+| 📈 **Analytics** | Revenue charts and recent order summaries |
+| 🖥️ **Responsive Layout** | `NavigationRail`-based admin panel for desktop & tablet |
+
+### 🎨 Theme & UI
+- ☀️ / 🌙 Full **light and dark mode** support
+- Dynamic colors that adapt to the active theme
+- Modern, clean UI with smooth animations
+- Refreshable dashboard with live stats
+
+---
+
+## 📱 Screenshots
 
 ### Flutter UI
-<img width="350" height="220" alt="admin dashboard" src="https://github.com/user-attachments/assets/e1838e1c-5cb1-40d9-bcf4-d23700813263" />
-<img src="https://github.com/user-attachments/assets/b80bb03b-8a97-410a-869e-3a16f03a7e48" width="100" height="300" />
-<img src="https://github.com/user-attachments/assets/310abf98-8921-4558-9c6f-10ed1b227960" width="100" />
-<img src="https://github.com/user-attachments/assets/d72da309-f0a9-4c70-84e3-b5f3d1efe8d2" width="100" />
-<img src="https://github.com/user-attachments/assets/e7bd2668-8d40-423c-bd81-1023dc7d2284" width="100" />
-<img src="https://github.com/user-attachments/assets/9e389dda-2318-4c74-b221-664f64f30091" width="100" />
 
+<table>
+  <tr>
+    <td align="center"><b>Admin Dashboard</b></td>
+    <td align="center"><b>Home</b></td>
+    <td align="center"><b>Products</b></td>
+    <td align="center"><b>Cart</b></td>
+    <td align="center"><b>Orders</b></td>
+    <td align="center"><b>Profile</b></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/e1838e1c-5cb1-40d9-bcf4-d23700813263" width="140" /></td>
+    <td><img src="https://github.com/user-attachments/assets/b80bb03b-8a97-410a-869e-3a16f03a7e48" width="80" /></td>
+    <td><img src="https://github.com/user-attachments/assets/310abf98-8921-4558-9c6f-10ed1b227960" width="80" /></td>
+    <td><img src="https://github.com/user-attachments/assets/d72da309-f0a9-4c70-84e3-b5f3d1efe8d2" width="80" /></td>
+    <td><img src="https://github.com/user-attachments/assets/e7bd2668-8d40-423c-bd81-1023dc7d2284" width="80" /></td>
+    <td><img src="https://github.com/user-attachments/assets/9e389dda-2318-4c74-b221-664f64f30091" width="80" /></td>
+  </tr>
+</table>
 
-### Backend With Laravel: 
-<img width="350" height="220" alt="backend" src="https://github.com/user-attachments/assets/2eccb176-9be0-4d12-a739-85d67fa27415" />
+### Laravel Backend
 
+<table>
+  <tr>
+    <td align="center"><b>Backend Panel</b></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/2eccb176-9be0-4d12-a739-85d67fa27415" width="350" /></td>
+  </tr>
+</table>
 
+---
 
-## 🔧 Installation
+## 🏗️ Architecture
 
-1. **Clone the repository:**
+```
+┌──────────────────────────────────────────────────────────────┐
+│                        Flutter App                           │
+│                                                              │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌─────────┐  │
+│  │   Auth   │   │   User   │   │  Admin   │   │  Cart   │  │
+│  │  Screens │   │  Screens │   │  Screens │   │ Screen  │  │
+│  └────┬─────┘   └────┬─────┘   └────┬─────┘   └────┬────┘  │
+│       └──────────────┴──────────────┴───────────────┘       │
+│                              │                               │
+│                   ┌──────────▼──────────┐                   │
+│                   │   Riverpod Providers │                   │
+│                   │  Auth · Admin · Cart │                   │
+│                   │  Theme · Orders      │                   │
+│                   └──────────┬──────────┘                   │
+│                              │                               │
+│                   ┌──────────▼──────────┐                   │
+│                   │    API Service       │  (http + Hive)   │
+│                   └─────────────────────┘                   │
+└──────────────────────────────┬───────────────────────────────┘
+                               │  HTTP / JSON
+┌──────────────────────────────▼───────────────────────────────┐
+│                      Laravel REST API                        │
+│                                                              │
+│  ┌────────────┐  ┌──────────────┐  ┌──────────────────────┐ │
+│  │AuthContrl. │  │ProductContrl.│  │  OrderController     │ │
+│  └────────────┘  └──────────────┘  └──────────────────────┘ │
+│                                                              │
+│  ┌────────────┐  ┌──────────────┐  ┌──────────────────────┐ │
+│  │AdminContrl.│  │PaymentContrl.│  │  Sanctum Tokens      │ │
+│  └────────────┘  └──────────────┘  └──────────────────────┘ │
+│                                                              │
+│              ┌─────────────────────────┐                    │
+│              │     Eloquent ORM        │                    │
+│              └────────────┬────────────┘                    │
+└───────────────────────────┼─────────────────────────────────┘
+                            │
+              ┌─────────────▼─────────────┐
+              │          MySQL            │
+              │  users · products         │
+              │  orders · payments        │
+              │  categories · sessions    │
+              └───────────────────────────┘
+```
+
+---
+
+## 🗂️ Project Structure
+
+```
+lib/
+├── 📂 admin_panel/          # Admin UI screens (dashboard, orders, products, users)
+├── 📂 cart/                 # Cart screen and checkout logic
+├── 📂 components/           # Entities, models, and utility classes
+├── 📂 data/                 # API services (auth, products, orders, payments)
+├── 📂 home/                 # User-facing home & browse screens
+├── 📂 presentation/         # Riverpod providers + auth/payment UI
+├── 📂 widgets/              # Reusable UI components
+├── 📄 main.dart             # App entry point
+└── 📄 app_root.dart         # Role-based routing (user vs admin)
+```
+
+---
+
+## 📦 State Management
+
+> All state is handled via **Riverpod** with `StateNotifierProvider` and `FutureProvider`.
+
+| Provider | Responsibility |
+|---------|---------------|
+| `AuthProvider` | Login, registration, logout, current user state |
+| `AdminProvider` | Dashboard stats, user/order/product management |
+| `CartProvider` | Cart items, quantities, and order creation |
+| `ThemeProvider` | Light/dark mode via **Hive** local storage |
+| `ProductProvider` | Fetch and cache food product listings |
+| `OrderProvider` | Order lifecycle — place, track, and update |
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+| Technology | Purpose |
+|-----------|---------|
+| **Flutter** | Cross-platform mobile & web UI |
+| **Riverpod** | Reactive state management |
+| **Hive** | Local storage for theme & settings |
+| **http** | REST API networking |
+| **cached_network_image** | Efficient image loading & caching |
+
+### Backend
+| Technology | Purpose |
+|-----------|---------|
+| **Laravel** | REST API framework |
+| **Laravel Sanctum** | Token-based authentication |
+| **Eloquent ORM** | Database abstraction |
+| **MySQL** | Primary relational database |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Flutter `>=3.x`
+- PHP `>=8.2`
+- Composer
+- MySQL
+- Laravel `10.x+`
+
+### 📱 Flutter Setup
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/bashii110/food_hub.git
 cd food_hub
 
-Install dependencies:
-
+# 2. Install Flutter dependencies
 flutter pub get
 
-
-Set up Hive (local storage for theme):
-
+# 3. Initialise Hive (already handled in main.dart)
 await Hive.initFlutter();
 await Hive.openBox('settings');
 
+# 4. Update your API base URL in lib/data/api_client.dart
+# Android emulator:  http://10.0.2.2:8000/api
+# Physical device:   http://YOUR_PC_IP:8000/api
 
-Run the app:
-
+# 5. Run the app
 flutter run
-
-⚡ Backend Setup
-
-Clone your backend repo (Laravel):
-
-git clone <backend-repo-url>
-cd backend
-
-
-Install PHP dependencies:
-
-composer install
-
-
-Copy .env.example to .env and configure your database:
-
-cp .env.example .env
-
-
-Generate app key:
-
-php artisan key:generate
-
-
-Run migrations and seeders:
-
-php artisan migrate --seed
-
-
-Run backend server:
-
-php artisan serve
-
-🗂 Project Structure
-lib/
-├── admin_panel/          # Admin UI screens
-├── cart/                 # Cart screen and logic
-├── components/           # Entities, models, utilities
-├── data/                 # Services (API, auth, products, orders)
-├── home/                 # User home screens
-├── presentation/         # Providers and UI for auth/payment
-├── widgets/              # Reusable widgets
-├── main.dart             # Entry point
-├── app_root.dart         # Authentication-based routing
-
-📈 State Management
-
-AuthProvider: Handles login, registration, logout, and current user state
-
-AdminProvider: Fetches admin dashboard stats and user/order/product management
-
-CartProvider: Manages cart items and order creation
-
-ThemeProvider: Manages light/dark theme using Hive storage
-
-Product & Order Providers: Handles fetching and updating products/orders via API
-
-💡 Notes
-
-All revenue and numeric fields are safely parsed using double.tryParse() to avoid runtime errors.
-
-Admin dashboard dynamically adjusts colors based on theme.
-
-Payment table in backend supports multiple methods and proof verification.
-
-🖼 Screenshots
-
-Add your screenshots here if available.
-
-🔗 License
-
-This project is open-source under the MIT License.
-
-🤝 Contributing
-
-Fork the repository
-
-Create a new branch (git checkout -b feature/your-feature)
-
-Commit your changes (git commit -m 'Add some feature')
-
-Push to the branch (git push origin feature/your-feature)
-
-Open a Pull Request
-
-⚙️ Contact
-
-Developer: Bashir Ahmed
-
-GitHub: https://github.com/bashii110
-
-Email: buxhiisd@gmail.com
-
+```
 
 ---
 
-If you want, I can also **add a “Backend API Endpoints” section** in this README, listing all Laravel routes like `/auth/login`, `/products`, `/orders`, etc., so your repo becomes fully self-documented for frontend-backend integration.  
+## ⚡ Backend Setup
 
-Do you want me to do that?
+```bash
+# 1. Clone the Laravel backend
+git clone <backend-repo-url>
+cd backend
+
+# 2. Install PHP dependencies
+composer install
+
+# 3. Set up environment
+cp .env.example .env
+php artisan key:generate
+
+# 4. Configure your .env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=food_hub
+DB_USERNAME=root
+DB_PASSWORD=your_password
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your@gmail.com
+MAIL_PASSWORD=your_app_password
+
+# 5. Run migrations and seed data
+php artisan migrate --seed
+
+# 6. Start the server
+php artisan serve
+```
+
+---
+
+## 💡 Developer Notes
+
+- All revenue and numeric fields use `double.tryParse()` to prevent runtime parsing errors.
+- Admin dashboard colors adapt dynamically to the active theme.
+- Payment table supports multiple methods with proof upload and admin verification workflow.
+- `NavigationRail` is used for a responsive admin layout on wider screens.
+
+---
+
+## 📌 Planned Features
+
+- [ ] Push notifications (FCM)
+- [ ] Real-time order tracking with WebSockets
+- [ ] Ratings & reviews for food items
+- [ ] Coupon and discount system
+- [ ] HTTPS + production deployment
+- [ ] iOS App Store & Google Play release
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how:
+
+```bash
+# 1. Fork the repository
+# 2. Create your feature branch
+git checkout -b feature/your-feature-name
+
+# 3. Commit your changes
+git commit -m "feat: describe your change"
+
+# 4. Push and open a PR
+git push origin feature/your-feature-name
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+**Built with ❤️ by [Bashir Ahmed](https://github.com/bashii110)**
+
+📧 buxhiisd@gmail.com
+
+<br/>
+
+⭐ **Star this repo** if you found it useful!
+
+<a href="https://github.com/bashii110/food_hub">
+  <img src="https://img.shields.io/badge/View%20on-GitHub-black?style=for-the-badge&logo=github" />
+</a>
+&nbsp;
+<a href="https://bashii110.github.io/food_hub/">
+  <img src="https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=flutter" />
+</a>
+
+</div>
