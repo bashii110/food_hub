@@ -83,12 +83,12 @@ Browse food. Place orders. Pay your way. All in one place.
 
 <table>
   <tr>
-    <td align="center"><b>Admin Dashboard</b></td>
+    <td align="center"><b>Admin Desktop View</b></td>
+    <td align="center"><b>Login</b></td>
+    <td align="center"><b>Register</b></td>
     <td align="center"><b>Home</b></td>
-    <td align="center"><b>Products</b></td>
     <td align="center"><b>Cart</b></td>
-    <td align="center"><b>Orders</b></td>
-    <td align="center"><b>Profile</b></td>
+    <td align="center"><b>Admin Mobile View</b></td>
   </tr>
   <tr>
     <td><img src="https://github.com/user-attachments/assets/e1838e1c-5cb1-40d9-bcf4-d23700813263" width="140" /></td>
