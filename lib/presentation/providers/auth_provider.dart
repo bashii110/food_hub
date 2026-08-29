@@ -447,6 +447,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
   }
 
   // ── Forgot Password ─────────────────────────────────────────
+
   Future<String> forgotPassword({
     required String email,
   }) async {
@@ -458,9 +459,93 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         },
       );
 
-      return res['message'] as String? ?? 'Reset link sent';
+      return res['message'] as String? ??
+          'Verification code sent to your email.';
     } on ApiException catch (e) {
-      return e.message;
+      throw Exception(e.firstError);
+    } catch (e) {
+      throw Exception('Unable to send verification code.');
+    }
+  }
+
+  // ── Verify Password Reset OTP ───────────────────────────────
+  Future<String> verifyResetOtp({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      final res = await apiClient.post(
+        '/auth/verify-reset-otp',
+        body: {
+          'email': email,
+          'otp': otp,
+        },
+      );
+
+      final resetToken = res['reset_token'] as String?;
+
+      if (resetToken == null || resetToken.isEmpty) {
+        throw Exception(
+          'OTP verified but reset token was not returned.',
+        );
+      }
+
+      return resetToken;
+    } on ApiException catch (e) {
+      throw Exception(e.firstError);
+    } catch (e) {
+      throw Exception(
+        e.toString().replaceFirst('Exception: ', ''),
+      );
+    }
+  }
+
+  // ── Resend Password Reset OTP ───────────────────────────────
+  Future<String> resendResetOtp({
+    required String email,
+  }) async {
+    try {
+      final res = await apiClient.post(
+        '/auth/forgot-password',
+        body: {
+          'email': email,
+        },
+      );
+
+      return res['message'] as String? ??
+          'A new verification code has been sent to your email.';
+    } on ApiException catch (e) {
+      throw Exception(e.firstError);
+    } catch (e) {
+      throw Exception(
+        'Unable to send verification code.',
+      );
+    }
+  }
+
+  // ── Reset Password ──────────────────────────────────────────
+  Future<void> resetPassword({
+    required String email,
+    required String resetToken,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    try {
+      await apiClient.post(
+        '/auth/reset-password',
+        body: {
+          'email': email,
+          'reset_token': resetToken,
+          'password': password,
+          'password_confirmation': passwordConfirmation,
+        },
+      );
+    } on ApiException catch (e) {
+      throw Exception(e.firstError);
+    } catch (e) {
+      throw Exception(
+        'Unable to reset password. Please try again.',
+      );
     }
   }
 }
