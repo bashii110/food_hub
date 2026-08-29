@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+
 import '../../data/services/api_client.dart';
 
 // ── AppUser model ─────────────────────────────────────────────
@@ -36,7 +37,9 @@ class AppUser {
   );
 
   bool get isAdmin => role == 'admin';
+
   bool get isStaff => role == 'admin' || role == 'staff';
+
   bool get isRider => role == 'rider';
 
   AppUser copyWith({
@@ -58,7 +61,12 @@ class AppUser {
 }
 
 // ── Auth State ────────────────────────────────────────────────
-enum AuthStatus { idle, loading, authenticated, unauthenticated }
+enum AuthStatus {
+  idle,
+  loading,
+  authenticated,
+  unauthenticated,
+}
 
 class AuthState {
   final AuthStatus status;
@@ -72,6 +80,7 @@ class AuthState {
   });
 
   bool get isAuthenticated => status == AuthStatus.authenticated;
+
   bool get isLoading => status == AuthStatus.loading;
 
   AuthState copyWith({
@@ -89,6 +98,7 @@ class AuthState {
 // ── Hive cart box helper ──────────────────────────────────────
 Future<void> _openCartBox(int userId) async {
   final boxName = 'cart_$userId';
+
   if (!Hive.isBoxOpen(boxName)) {
     await Hive.openBox<dynamic>(boxName);
   }
@@ -96,6 +106,7 @@ Future<void> _openCartBox(int userId) async {
 
 Future<void> _closeCartBox(int userId) async {
   final boxName = 'cart_$userId';
+
   if (Hive.isBoxOpen(boxName)) {
     await Hive.box<dynamic>(boxName).close();
   }
@@ -107,91 +118,248 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
   Future<AuthState> build() async {
     // Restore session on app start
     final token = await apiClient.getToken();
+
     if (token == null) {
-      return const AuthState(status: AuthStatus.unauthenticated);
+      return const AuthState(
+        status: AuthStatus.unauthenticated,
+      );
     }
 
     try {
       final res = await apiClient.get('/auth/me');
-      final user = AppUser.fromJson(res['user'] as Map<String, dynamic>);
 
-      // ── Re-open this user's cart box for the restored session ──
+      final user = AppUser.fromJson(
+        res['user'] as Map<String, dynamic>,
+      );
+
+      // Re-open this user's cart box
       await _openCartBox(user.id);
 
-      return AuthState(status: AuthStatus.authenticated, user: user);
+      return AuthState(
+        status: AuthStatus.authenticated,
+        user: user,
+      );
     } catch (e) {
       await apiClient.clearToken();
-      return const AuthState(status: AuthStatus.unauthenticated);
+
+      return const AuthState(
+        status: AuthStatus.unauthenticated,
+      );
     }
   }
 
-  // ── Register ─────────────────────────────────────────────────
+  // ── Register ────────────────────────────────────────────────
+  //
+  // Registration does NOT authenticate the user anymore.
+  //
+  // Flow:
+  // Register → OTP sent → OTP screen → Verify OTP → Dashboard
+  //
   Future<void> register({
     required String name,
     required String email,
     required String password,
     String? phone,
   }) async {
-    state = const AsyncValue.data(AuthState(status: AuthStatus.loading));
+    state = const AsyncValue.data(
+      AuthState(
+        status: AuthStatus.loading,
+      ),
+    );
+
     try {
-      final res = await apiClient.post('/auth/register', body: {
-        'name': name,
-        'email': email,
-        'password': password,
-        'password_confirmation': password,
-        if (phone != null && phone.isNotEmpty) 'phone': phone,
-      });
+      await apiClient.post(
+        '/auth/register',
+        body: {
+          'name': name,
+          'email': email,
+          'password': password,
+          'password_confirmation': password,
+          if (phone != null && phone.isNotEmpty) 'phone': phone,
+        },
+      );
 
-      await apiClient.setToken(res['token'] as String);
-      final user = AppUser.fromJson(res['user'] as Map<String, dynamic>);
-
-      // ── Open cart box for the newly registered user ────────────
-      await _openCartBox(user.id);
-
-      state = AsyncValue.data(
-          AuthState(status: AuthStatus.authenticated, user: user));
+      // IMPORTANT:
+      // Do NOT save token here.
+      //
+      // User must verify OTP first.
+      state = const AsyncValue.data(
+        AuthState(
+          status: AuthStatus.unauthenticated,
+        ),
+      );
     } on ApiException catch (e) {
-      state = AsyncValue.data(AuthState(
-          status: AuthStatus.unauthenticated, error: e.firstError));
+      state = AsyncValue.data(
+        AuthState(
+          status: AuthStatus.unauthenticated,
+          error: e.firstError,
+        ),
+      );
     } catch (e) {
-      state = AsyncValue.data(AuthState(
-          status: AuthStatus.unauthenticated, error: e.toString()));
+      state = AsyncValue.data(
+        AuthState(
+          status: AuthStatus.unauthenticated,
+          error: e.toString(),
+        ),
+      );
     }
   }
 
-  // ── Login ─────────────────────────────────────────────────────
+  // ── Verify OTP ──────────────────────────────────────────────
+  Future<void> verifyOtp({
+    required String email,
+    required String otp,
+  }) async {
+    state = const AsyncValue.data(
+      AuthState(
+        status: AuthStatus.loading,
+      ),
+    );
+
+    try {
+      final res = await apiClient.post(
+        '/auth/verify-otp',
+        body: {
+          'email': email,
+          'otp': otp,
+        },
+      );
+
+      // Token should be returned ONLY after OTP verification.
+      final token = res['token'] as String?;
+
+      if (token == null || token.isEmpty) {
+        throw const ApiException(
+          statusCode: 500,
+          message:
+          'Verification succeeded but no authentication token was returned.',
+        );
+      }
+
+      // Save token only after successful OTP verification.
+      await apiClient.setToken(token);
+
+      // Get user from response if available.
+      AppUser? user;
+
+      if (res['user'] is Map<String, dynamic>) {
+        user = AppUser.fromJson(
+          res['user'] as Map<String, dynamic>,
+        );
+      } else {
+        // If verify-otp doesn't return user,
+        // fetch the authenticated user.
+        final meRes = await apiClient.get('/auth/me');
+
+        user = AppUser.fromJson(
+          meRes['user'] as Map<String, dynamic>,
+        );
+      }
+
+      // Open user's isolated cart.
+      await _openCartBox(user.id);
+
+      state = AsyncValue.data(
+        AuthState(
+          status: AuthStatus.authenticated,
+          user: user,
+        ),
+      );
+    } on ApiException catch (e) {
+      state = AsyncValue.data(
+        AuthState(
+          status: AuthStatus.unauthenticated,
+          error: e.firstError,
+        ),
+      );
+    } catch (e) {
+      state = AsyncValue.data(
+        AuthState(
+          status: AuthStatus.unauthenticated,
+          error: e.toString(),
+        ),
+      );
+    }
+  }
+
+  // ── Resend OTP ──────────────────────────────────────────────
+  Future<String?> resendOtp({
+    required String email,
+  }) async {
+    try {
+      final res = await apiClient.post(
+        '/auth/resend-otp',
+        body: {
+          'email': email,
+        },
+      );
+
+      return res['message'] as String? ?? 'OTP sent successfully';
+    } on ApiException catch (e) {
+      return e.firstError;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  // ── Login ───────────────────────────────────────────────────
   Future<void> login({
     required String email,
     required String password,
   }) async {
-    state = const AsyncValue.data(AuthState(status: AuthStatus.loading));
+    state = const AsyncValue.data(
+      AuthState(
+        status: AuthStatus.loading,
+      ),
+    );
+
     try {
-      final res = await apiClient.post('/auth/login', body: {
-        'email': email,
-        'password': password,
-      });
+      final res = await apiClient.post(
+        '/auth/login',
+        body: {
+          'email': email,
+          'password': password,
+        },
+      );
 
-      await apiClient.setToken(res['token'] as String);
-      final user = AppUser.fromJson(res['user'] as Map<String, dynamic>);
+      await apiClient.setToken(
+        res['token'] as String,
+      );
 
-      // ── Open this user's isolated cart box ─────────────────────
+      final user = AppUser.fromJson(
+        res['user'] as Map<String, dynamic>,
+      );
+
+      // Open this user's isolated cart.
       await _openCartBox(user.id);
 
       state = AsyncValue.data(
-          AuthState(status: AuthStatus.authenticated, user: user));
+        AuthState(
+          status: AuthStatus.authenticated,
+          user: user,
+        ),
+      );
     } on ApiException catch (e) {
-      state = AsyncValue.data(AuthState(
-          status: AuthStatus.unauthenticated, error: e.message));
+      state = AsyncValue.data(
+        AuthState(
+          status: AuthStatus.unauthenticated,
+          error: e.message,
+        ),
+      );
     } catch (e) {
-      state = AsyncValue.data(AuthState(
-          status: AuthStatus.unauthenticated, error: e.toString()));
+      state = AsyncValue.data(
+        AuthState(
+          status: AuthStatus.unauthenticated,
+          error: e.toString(),
+        ),
+      );
     }
   }
 
-  // ── Logout ────────────────────────────────────────────────────
+  // ── Logout ─────────────────────────────────────────────────
   Future<void> logout() async {
-    // ── Close this user's cart box before clearing session ────────
     final userId = state.value?.user?.id;
+
     if (userId != null) {
       await _closeCartBox(userId);
     }
@@ -199,12 +367,17 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     try {
       await apiClient.post('/auth/logout');
     } catch (_) {}
+
     await apiClient.clearToken();
+
     state = const AsyncValue.data(
-        AuthState(status: AuthStatus.unauthenticated));
+      AuthState(
+        status: AuthStatus.unauthenticated,
+      ),
+    );
   }
 
-  // ── Update Profile ────────────────────────────────────────────
+  // ── Update Profile ─────────────────────────────────────────
   Future<String?> updateProfile({
     String? name,
     String? phone,
@@ -221,32 +394,51 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
           if (name != null) 'name': name,
           if (phone != null) 'phone': phone,
           if (address != null) 'address': address,
-          if (currentPassword != null) 'current_password': currentPassword,
+          if (currentPassword != null)
+            'current_password': currentPassword,
           if (newPassword != null) 'new_password': newPassword,
-          if (newPassword != null) 'new_password_confirmation': newPassword,
+          if (newPassword != null)
+            'new_password_confirmation': newPassword,
           '_method': 'PUT',
         };
+
         result = await apiClient.postMultipart(
           '/auth/profile',
           fields,
-          {'profile_image': profileImageBytes},
+          {
+            'profile_image': profileImageBytes,
+          },
         );
       } else {
         final body = <String, dynamic>{
           if (name != null) 'name': name,
           if (phone != null) 'phone': phone,
           if (address != null) 'address': address,
-          if (currentPassword != null) 'current_password': currentPassword,
+          if (currentPassword != null)
+            'current_password': currentPassword,
           if (newPassword != null) 'new_password': newPassword,
-          if (newPassword != null) 'new_password_confirmation': newPassword,
+          if (newPassword != null)
+            'new_password_confirmation': newPassword,
         };
-        result = await apiClient.put('/auth/profile', body: body);
+
+        result = await apiClient.put(
+          '/auth/profile',
+          body: body,
+        );
       }
 
-      final user = AppUser.fromJson(result['user'] as Map<String, dynamic>);
+      final user = AppUser.fromJson(
+        result['user'] as Map<String, dynamic>,
+      );
+
       state = AsyncValue.data(
-          AuthState(status: AuthStatus.authenticated, user: user));
-      return null; // success
+        AuthState(
+          status: AuthStatus.authenticated,
+          user: user,
+        ),
+      );
+
+      return null;
     } on ApiException catch (e) {
       return e.firstError;
     } catch (e) {
@@ -254,11 +446,18 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     }
   }
 
-  // ── Forgot Password ───────────────────────────────────────────
-  Future<String> forgotPassword({required String email}) async {
+  // ── Forgot Password ─────────────────────────────────────────
+  Future<String> forgotPassword({
+    required String email,
+  }) async {
     try {
-      final res = await apiClient
-          .post('/auth/forgot-password', body: {'email': email});
+      final res = await apiClient.post(
+        '/auth/forgot-password',
+        body: {
+          'email': email,
+        },
+      );
+
       return res['message'] as String? ?? 'Reset link sent';
     } on ApiException catch (e) {
       return e.message;
@@ -266,6 +465,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
   }
 }
 
+// ── Auth Provider ─────────────────────────────────────────────
 final authProvider = AsyncNotifierProvider<AuthNotifier, AuthState>(
   AuthNotifier.new,
 );

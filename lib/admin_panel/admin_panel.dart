@@ -8,7 +8,7 @@ import '../presentation/providers/auth_provider.dart';
 
 
 /* ══════════════════════════════════════════════════════════
-   ENTRY POINT  –  AdminApp
+   ENTRY POINT – AdminApp
    ══════════════════════════════════════════════════════════ */
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

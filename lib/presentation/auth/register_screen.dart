@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app_root.dart';
 import '../providers/auth_provider.dart';
+import 'otpverify_onregister.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -29,12 +30,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+
   Future<void> _handleRegister() async {
     final authNotifier = ref.read(authProvider.notifier);
 
     // Validation
-    if (_nameController.text.isEmpty ||
-        _emailController.text.isEmpty ||
+    if (_nameController.text.trim().isEmpty ||
+        _emailController.text.trim().isEmpty ||
         _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -65,32 +67,43 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
-    // Call register
+    final email = _emailController.text.trim();
+
+    // Register user
     await authNotifier.register(
       name: _nameController.text.trim(),
-      email: _emailController.text.trim(),
+      email: email,
       password: _passwordController.text,
       phone: _phoneController.text.trim().isEmpty
           ? null
           : _phoneController.text.trim(),
     );
 
-    // ✅ Check if user is now logged in
+    if (!mounted) return;
+
+    // Read the latest auth state
     final authState = ref.read(authProvider).maybeWhen(
       data: (state) => state,
       orElse: () => null,
     );
 
-    if (authState != null && authState.user != null) {
-      // Navigate to AppRoot replacement to refresh UI
-      if (!mounted) return;
-      Navigator.pushAndRemoveUntil(
+    // Registration successful
+    // User should NOT go to dashboard yet.
+    // Go to OTP verification screen instead.
+    if (authState != null &&
+        authState.error == null &&
+        authState.user == null) {
+      Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const AppRoot()),
-            (route) => false,
+        MaterialPageRoute(
+          builder: (_) => OtpVerificationScreen(
+            email: email,
+          ),
+        ),
       );
     }
   }
+
 
 
   @override
