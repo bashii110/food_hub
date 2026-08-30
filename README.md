@@ -13,14 +13,24 @@
 <p><strong>A full-stack Flutter food ordering app with a powerful Admin Panel — built for speed, simplicity, and scale.</strong></p>
 
 <p>
-  <a href="https://bashii110.github.io/food_hub/"><img src="https://img.shields.io/badge/🌐%20Live%20Demo-Click%20Here-brightgreen?style=flat-square" /></a>
+  <a href="https://github.com/bashii110/food_hub/releases/tag/v1.0.1">
+    <img src="https://img.shields.io/badge/📱%20Download%20APK-v1.0.1-brightgreen?style=for-the-badge" />
+  </a>
   &nbsp;
+  <a href="https://bashii110.github.io/food_hub/">
+    <img src="https://img.shields.io/badge/🌐%20Live%20Demo-Click%20Here-blue?style=for-the-badge" />
+  </a>
+</p>
+
+<p>
   <img src="https://img.shields.io/badge/License-MIT-green.svg" />
   &nbsp;
   <img src="https://img.shields.io/badge/Status-Active%20Development-brightgreen" />
   &nbsp;
   <img src="https://img.shields.io/badge/Theme-Light%20%2F%20Dark-blueviolet" />
 </p>
+
+
 
 <br/>
 
