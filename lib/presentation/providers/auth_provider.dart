@@ -139,12 +139,27 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
         status: AuthStatus.authenticated,
         user: user,
       );
-    } catch (e) {
-      await apiClient.clearToken();
+    } on ApiException catch (e) {
+      // BUGFIX: previously ANY failure here (including a plain network
+      // timeout with no connectivity) cleared the stored token and threw
+      // the user back to the login screen — meaning opening the app
+      // without signal silently logged people out even though their
+      // session was perfectly valid. Only clear the token when the
+      // server actually rejected it (401/403). Any other failure
+      // (network error, 5xx, timeout) leaves the token in place; the next
+      // successful launch will pick the session back up automatically.
+      if (e.isUnauthorized || e.isForbidden) {
+        await apiClient.clearToken();
+        return const AuthState(status: AuthStatus.unauthenticated);
+      }
 
       return const AuthState(
         status: AuthStatus.unauthenticated,
+        error: 'Could not reach the server. Check your connection and try again.',
       );
+    } catch (e) {
+      // Unexpected/parse error — don't destroy a potentially valid token.
+      return const AuthState(status: AuthStatus.unauthenticated);
     }
   }
 

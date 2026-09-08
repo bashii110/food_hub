@@ -1,4 +1,4 @@
-package com.example.untitled
+package com.buxhiisd.foodhub
 
 import io.flutter.embedding.android.FlutterActivity
 

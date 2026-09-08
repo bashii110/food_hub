@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'api_config.dart';
 
@@ -20,7 +20,17 @@ class ApiClient {
   // static const String baseUrl = 'http:// 192.168.100.21:8000/api';
   static const String baseUrl = ApiConfig.baseUrl;
 
-
+  // BUGFIX: the JWT is a bearer credential — it used to be stored via
+  // plain SharedPreferences, which is an unencrypted XML/plist file on
+  // disk (readable on a rooted/jailbroken device, via ADB backup, or from
+  // an on-disk file dump). It's now stored through flutter_secure_storage,
+  // which is backed by the Android Keystore (EncryptedSharedPreferences)
+  // and the iOS Keychain. The public API (setToken/getToken/clearToken)
+  // is unchanged, so nothing else in the app needs to change.
+  static const _secureStorage = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
+  static const _tokenKey = 'jwt_token';
 
   String? _token;
   bool _isRefreshing = false;
@@ -28,19 +38,17 @@ class ApiClient {
   // ── Token Management ────────────────────────────────────────
   Future<void> setToken(String token) async {
     _token = token;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('jwt_token', token);
+    await _secureStorage.write(key: _tokenKey, value: token);
   }
 
   Future<String?> getToken() async {
-    _token ??= (await SharedPreferences.getInstance()).getString('jwt_token');
+    _token ??= await _secureStorage.read(key: _tokenKey);
     return _token;
   }
 
   Future<void> clearToken() async {
     _token = null;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('jwt_token');
+    await _secureStorage.delete(key: _tokenKey);
   }
 
   // ── HTTP Methods ────────────────────────────────────────────

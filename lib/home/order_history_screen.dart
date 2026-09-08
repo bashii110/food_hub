@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:food_hub/home/homescreen.dart';
 import '../../data/services/api_client.dart';
 import '../../data/services/order_service.dart';
 import '../presentation/payment/payment_method_screen.dart';
@@ -7,7 +8,7 @@ import '../presentation/providers/auth_provider.dart';
 
 // ── Provider ──────────────────────────────────────────────────
 final userOrdersProvider =
-FutureProvider<List<Map<String, dynamic>>>((ref) async {
+    FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final authState = ref.watch(authProvider);
   if (authState.value?.user == null) return [];
   return OrderService.getMyOrders();
@@ -25,6 +26,22 @@ class OrderHistoryScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('My Orders'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.home_outlined),
+            tooltip: 'Go to Home',
+            onPressed: () {
+              // Navigator.pushAndRemoveUntil(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (_) => const HomeScreen(),
+              //   ),
+              //       (route) => false,
+              // );
+
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Refresh',
@@ -106,35 +123,34 @@ class _OrderCard extends StatelessWidget {
             // ── Items ──
             if (items.isNotEmpty)
               ...items.map((item) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Row(
-                  children: [
-                    Text('${item['quantity']}x ',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w600)),
-                    Expanded(
-                      child: Text(
-                        item['product_name'] as String? ??
-                            (item['product'] as Map?)?['name'] as String? ??
-                            'Item',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Row(
+                      children: [
+                        Text('${item['quantity']}x ',
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w600)),
+                        Expanded(
+                          child: Text(
+                            item['product_name'] as String? ??
+                                (item['product'] as Map?)?['name'] as String? ??
+                                'Item',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Text(
+                          'PKR ${_fmt(item['price'])}',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ],
                     ),
-                    Text(
-                      'PKR ${_fmt(item['price'])}',
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              )),
+                  )),
 
             const Divider(height: 20),
 
             // ── Amounts ──
             _AmountRow(
-                label: 'Subtotal',
-                value: 'PKR ${_fmt(order['subtotal'])}'),
+                label: 'Subtotal', value: 'PKR ${_fmt(order['subtotal'])}'),
             _AmountRow(
                 label: 'Delivery Fee',
                 value: 'PKR ${_fmt(order['delivery_fee'])}'),
@@ -155,8 +171,7 @@ class _OrderCard extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (_) => PaymentMethodScreen(
                         orderId: order['id'] as int,
-                        amount:
-                        (order['total_amount'] as num).toDouble(),
+                        amount: (order['total_amount'] as num).toDouble(),
                       ),
                     ),
                   ).then((_) => onChanged()),
@@ -176,8 +191,8 @@ class _OrderCard extends StatelessWidget {
                   label: const Text('Cancel Order'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Theme.of(context).colorScheme.error,
-                    side: BorderSide(
-                        color: Theme.of(context).colorScheme.error),
+                    side:
+                        BorderSide(color: Theme.of(context).colorScheme.error),
                   ),
                 ),
               ),
@@ -202,8 +217,7 @@ class _OrderCard extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Order cancelled'),
-              backgroundColor: Colors.orange),
+              content: Text('Order cancelled'), backgroundColor: Colors.orange),
         );
       }
     } on ApiException catch (e) {
@@ -288,31 +302,31 @@ class _CancelDialogState extends State<_CancelDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Cancel Order'),
-    content: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Text('Are you sure? This cannot be undone.'),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _ctrl,
-          decoration: const InputDecoration(
-              labelText: 'Reason (optional)', border: OutlineInputBorder()),
+        title: const Text('Cancel Order'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Are you sure? This cannot be undone.'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _ctrl,
+              decoration: const InputDecoration(
+                  labelText: 'Reason (optional)', border: OutlineInputBorder()),
+            ),
+          ],
         ),
-      ],
-    ),
-    actions: [
-      TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Keep Order')),
-      FilledButton(
-        onPressed: () => Navigator.pop(context, _ctrl.text.trim()),
-        style: FilledButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.error),
-        child: const Text('Cancel Order'),
-      ),
-    ],
-  );
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Keep Order')),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, _ctrl.text.trim()),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error),
+            child: const Text('Cancel Order'),
+          ),
+        ],
+      );
 }
 
 // ── Amount Row ────────────────────────────────────────────────
@@ -325,17 +339,19 @@ class _AmountRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 2),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label,
-            style: bold ? const TextStyle(fontWeight: FontWeight.bold) : null),
-        Text(value,
-            style: bold ? const TextStyle(fontWeight: FontWeight.bold) : null),
-      ],
-    ),
-  );
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label,
+                style:
+                    bold ? const TextStyle(fontWeight: FontWeight.bold) : null),
+            Text(value,
+                style:
+                    bold ? const TextStyle(fontWeight: FontWeight.bold) : null),
+          ],
+        ),
+      );
 }
 
 // ── Empty State ───────────────────────────────────────────────
@@ -343,25 +359,23 @@ class _EmptyOrders extends StatelessWidget {
   const _EmptyOrders();
   @override
   Widget build(BuildContext context) => Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.receipt_long,
-            size: 80,
-            color: Theme.of(context)
-                .colorScheme
-                .onSurface
-                .withOpacity(0.2)),
-        const SizedBox(height: 16),
-        const Text('No orders yet',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 8),
-        Text('Your order history will appear here',
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant)),
-      ],
-    ),
-  );
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.receipt_long,
+                size: 80,
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
+            const SizedBox(height: 16),
+            const Text('No orders yet',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            Text('Your order history will appear here',
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          ],
+        ),
+      );
 }
 
 // ── Error View ────────────────────────────────────────────────
@@ -371,22 +385,22 @@ class _ErrorView extends StatelessWidget {
   const _ErrorView({required this.message, required this.onRetry});
   @override
   Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.cloud_off, size: 64, color: Colors.grey),
-          const SizedBox(height: 16),
-          Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.cloud_off, size: 64, color: Colors.grey),
+              const SizedBox(height: 16),
+              Text(message, textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry'),
+              ),
+            ],
           ),
-        ],
-      ),
-    ),
-  );
+        ),
+      );
 }

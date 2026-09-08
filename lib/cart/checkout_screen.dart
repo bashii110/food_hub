@@ -116,6 +116,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     setState(() => _isProcessing = true);
 
+    // BUGFIX: track whether the order was actually created on the server
+    // before anything can go wrong. Order creation and payment-proof
+    // upload are two separate network calls — if the first succeeds and
+    // the second fails, the previous code showed a generic "failed to
+    // place order" message with no indication the order already exists.
+    // Users naturally retried, which created a second, duplicate order
+    // for the same cart. See _handlePlaceOrderFailure below.
+    int? createdOrderId;
+
     try {
       final items = cartItems
           .map((item) => {'product_id': int.parse(item.food.id), 'quantity': item.quantity})
@@ -132,6 +141,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       );
 
       final orderId = order['id'] as int;
+      createdOrderId = orderId;
 
       // Step 2 — upload screenshot (online only)
       if (_isOnlinePayment) {
@@ -159,12 +169,36 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             (route) => route.isFirst,
       );
     } on ApiException catch (e) {
-      if (mounted) _showError(e.firstError);
+      if (mounted) _handlePlaceOrderFailure(createdOrderId, e.firstError);
     } catch (e) {
-      if (mounted) _showError('Failed to place order. Please try again.');
+      if (mounted) _handlePlaceOrderFailure(createdOrderId, null);
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
+  }
+
+  /// Shows the right message depending on whether the order was already
+  /// created before the failure happened, and prevents an accidental
+  /// duplicate submission of the same cart.
+  void _handlePlaceOrderFailure(int? createdOrderId, String? detail) {
+    if (createdOrderId != null) {
+      // The order exists server-side (only the proof upload failed).
+      // Clear the cart so the user can't resubmit the same items as a
+      // second order, and point them at Order History to finish up.
+      ref.read(cartProvider.notifier).clearCart();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          'Your order #$createdOrderId was placed, but we could not upload '
+              'your payment screenshot${detail != null ? ' ($detail)' : ''}. '
+              'Go to "My Orders" to upload it there — please don\'t place this order again.',
+        ),
+        backgroundColor: Colors.orange,
+        duration: const Duration(seconds: 6),
+      ));
+      return;
+    }
+
+    _showError(detail ?? 'Failed to place order. Please try again.');
   }
 
   void _showError(String msg) {
@@ -464,7 +498,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
                 if (_hasScreenshot)
                   TextButton.icon(
-                    onPressed: _pickScreenshot,
+                    onPressed: () => _pickScreenshot(),
                     icon:  const Icon(Icons.change_circle_outlined),
                     label: const Text('Change Screenshot'),
                   ),

@@ -34,208 +34,208 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     return subtotal + deliveryFee;
   }
 
-  Future<String?> _showAddressDialog() async {
-    final controller = TextEditingController();
-    return showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(Icons.location_on, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(width: 8),
-            const Text('Delivery Address'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Enter your complete delivery address:',
-              style: TextStyle(fontSize: 14),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                hintText: 'House #, Street, Area, City',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                prefixIcon: const Icon(Icons.home),
-              ),
-              maxLines: 3,
-              autofocus: true,
-              textCapitalization: TextCapitalization.words,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (controller.text.trim().isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter address')),
-                );
-                return;
-              }
-              Navigator.pop(context, controller.text.trim());
-            },
-            child: const Text('Continue'),
-          ),
-        ],
-      ),
-    );
-  }
+  // Future<String?> _showAddressDialog() async {
+  //   final controller = TextEditingController();
+  //   return showDialog<String>(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (context) => AlertDialog(
+  //       title: Row(
+  //         children: [
+  //           Icon(Icons.location_on, color: Theme.of(context).colorScheme.primary),
+  //           const SizedBox(width: 8),
+  //           const Text('Delivery Address'),
+  //         ],
+  //       ),
+  //       content: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           const Text(
+  //             'Enter your complete delivery address:',
+  //             style: TextStyle(fontSize: 14),
+  //           ),
+  //           const SizedBox(height: 16),
+  //           TextField(
+  //             controller: controller,
+  //             decoration: InputDecoration(
+  //               hintText: 'House #, Street, Area, City',
+  //               border: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(12),
+  //               ),
+  //               prefixIcon: const Icon(Icons.home),
+  //             ),
+  //             maxLines: 3,
+  //             autofocus: true,
+  //             textCapitalization: TextCapitalization.words,
+  //           ),
+  //         ],
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('Cancel'),
+  //         ),
+  //         ElevatedButton(
+  //           onPressed: () {
+  //             if (controller.text.trim().isEmpty) {
+  //               ScaffoldMessenger.of(context).showSnackBar(
+  //                 const SnackBar(content: Text('Please enter address')),
+  //               );
+  //               return;
+  //             }
+  //             Navigator.pop(context, controller.text.trim());
+  //           },
+  //           child: const Text('Continue'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+  //
+  // Future<String?> _showPaymentMethodDialog() async {
+  //   return showDialog<String>(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('Select Payment Method'),
+  //       content: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           ListTile(
+  //             leading: const Icon(Icons.phone_android, color: Colors.purple),
+  //             title: const Text('JazzCash'),
+  //             subtitle: const Text('Pay via JazzCash mobile app'),
+  //             onTap: () => Navigator.pop(context, 'jazzcash'),
+  //           ),
+  //           ListTile(
+  //             leading: const Icon(Icons.mobile_friendly, color: Colors.blue),
+  //             title: const Text('Easypaisa'),
+  //             subtitle: const Text('Pay via Easypaisa mobile app'),
+  //             onTap: () => Navigator.pop(context, 'easypaisa'),
+  //           ),
+  //           ListTile(
+  //             leading: const Icon(Icons.account_balance, color: Colors.green),
+  //             title: const Text('Bank Transfer'),
+  //             subtitle: const Text('Direct bank transfer'),
+  //             onTap: () => Navigator.pop(context, 'bank_transfer'),
+  //           ),
+  //           ListTile(
+  //             leading: const Icon(Icons.money, color: Colors.orange),
+  //             title: const Text('Cash on Delivery'),
+  //             subtitle: const Text('Pay when you receive'),
+  //             onTap: () => Navigator.pop(context, 'cash_on_delivery'),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  Future<String?> _showPaymentMethodDialog() async {
-    return showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Payment Method'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.phone_android, color: Colors.purple),
-              title: const Text('JazzCash'),
-              subtitle: const Text('Pay via JazzCash mobile app'),
-              onTap: () => Navigator.pop(context, 'jazzcash'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.mobile_friendly, color: Colors.blue),
-              title: const Text('Easypaisa'),
-              subtitle: const Text('Pay via Easypaisa mobile app'),
-              onTap: () => Navigator.pop(context, 'easypaisa'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.account_balance, color: Colors.green),
-              title: const Text('Bank Transfer'),
-              subtitle: const Text('Direct bank transfer'),
-              onTap: () => Navigator.pop(context, 'bank_transfer'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.money, color: Colors.orange),
-              title: const Text('Cash on Delivery'),
-              subtitle: const Text('Pay when you receive'),
-              onTap: () => Navigator.pop(context, 'cash_on_delivery'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _handleCheckout() async {
-    // Check login
-    final authState = ref.read(authProvider).value;
-    if (authState?.user == null) {
-      final shouldLogin = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Login Required'),
-          content: const Text('Please login to place an order.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Login'),
-            ),
-          ],
-        ),
-      );
-      if (shouldLogin == true && mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
-        );
-      }
-      return;
-    }
-
-    final cartItems = ref.read(cartProvider).value ?? [];
-    if (cartItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cart is empty')),
-      );
-      return;
-    }
-
-    setState(() => _isProcessing = true);
-
-    try {
-      final address = await _showAddressDialog();
-      if (address == null || address.isEmpty) {
-        setState(() => _isProcessing = false);
-        return;
-      }
-
-      final paymentMethod = await _showPaymentMethodDialog();
-      if (paymentMethod == null) {
-        setState(() => _isProcessing = false);
-        return;
-      }
-
-      final items = cartItems
-          .map((item) => {
-        'product_id': int.parse(item.food.id),
-        'quantity': item.quantity,
-      })
-          .toList();
-
-      final order = await OrderService.placeOrder(
-        items: items,
-        deliveryAddress: address,
-        paymentMethod: paymentMethod,
-      );
-
-      if (order == null) throw Exception('Failed to create order');
-
-      ref.read(cartProvider.notifier).clearCart();
-
-      if (!mounted) return;
-
-      if (paymentMethod == 'cash_on_delivery') {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Order placed successfully! Cash on Delivery'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 3),
-          ),
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => PaymentUploadScreen(
-              orderId: order['id'] as int,
-              amount: (order['total_amount'] as num).toDouble(),
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isProcessing = false);
-    }
-  }
+  // Future<void> _handleCheckout() async {
+  //   // Check login
+  //   final authState = ref.read(authProvider).value;
+  //   if (authState?.user == null) {
+  //     final shouldLogin = await showDialog<bool>(
+  //       context: context,
+  //       builder: (context) => AlertDialog(
+  //         title: const Text('Login Required'),
+  //         content: const Text('Please login to place an order.'),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.pop(context, false),
+  //             child: const Text('Cancel'),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: () => Navigator.pop(context, true),
+  //             child: const Text('Login'),
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //     if (shouldLogin == true && mounted) {
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(builder: (_) => const LoginScreen()),
+  //       );
+  //     }
+  //     return;
+  //   }
+  //
+  //   final cartItems = ref.read(cartProvider).value ?? [];
+  //   if (cartItems.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Cart is empty')),
+  //     );
+  //     return;
+  //   }
+  //
+  //   setState(() => _isProcessing = true);
+  //
+  //   try {
+  //     final address = await _showAddressDialog();
+  //     if (address == null || address.isEmpty) {
+  //       setState(() => _isProcessing = false);
+  //       return;
+  //     }
+  //
+  //     final paymentMethod = await _showPaymentMethodDialog();
+  //     if (paymentMethod == null) {
+  //       setState(() => _isProcessing = false);
+  //       return;
+  //     }
+  //
+  //     final items = cartItems
+  //         .map((item) => {
+  //       'product_id': int.parse(item.food.id),
+  //       'quantity': item.quantity,
+  //     })
+  //         .toList();
+  //
+  //     final order = await OrderService.placeOrder(
+  //       items: items,
+  //       deliveryAddress: address,
+  //       paymentMethod: paymentMethod,
+  //     );
+  //
+  //     if (order == null) throw Exception('Failed to create order');
+  //
+  //     ref.read(cartProvider.notifier).clearCart();
+  //
+  //     if (!mounted) return;
+  //
+  //     if (paymentMethod == 'cash_on_delivery') {
+  //       Navigator.pop(context);
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //           content: Text('✅ Order placed successfully! Cash on Delivery'),
+  //           backgroundColor: Colors.green,
+  //           duration: Duration(seconds: 3),
+  //         ),
+  //       );
+  //     } else {
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (_) => PaymentUploadScreen(
+  //             orderId: order['id'] as int,
+  //             amount: (order['total_amount'] as num).toDouble(),
+  //           ),
+  //         ),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text('Error: $e'),
+  //           backgroundColor: Colors.red,
+  //         ),
+  //       );
+  //     }
+  //   } finally {
+  //     if (mounted) setState(() => _isProcessing = false);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

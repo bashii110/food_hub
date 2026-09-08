@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:food_hub/home/order_history_screen.dart';
 import '../../home/homescreen.dart';
 import '../providers/cart_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -184,10 +185,9 @@ class OrderSuccessScreen extends ConsumerWidget {
                 ElevatedButton.icon(
                   onPressed: () {
                     // Navigate to home and let the user go to order history
-                    Navigator.pushAndRemoveUntil(
+                    Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (_) => const HomeScreen()),
-                          (route) => false,
+                      MaterialPageRoute(builder: (_) => const OrderHistoryScreen())
                     );
                   },
                   icon: const Icon(Icons.receipt_long),
@@ -204,11 +204,14 @@ class OrderSuccessScreen extends ConsumerWidget {
 
                 OutlinedButton.icon(
                   onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const HomeScreen()),
-                          (route) => false,
-                    );
+                    // Navigator.pushAndRemoveUntil(
+                    //   context,
+                    //   MaterialPageRoute(builder: (_) => const HomeScreen()),
+                    //       (route) => false,
+                    // );
+
+                    Navigator.pop(context);
+                    Navigator.pop(context);
                   },
                   icon: const Icon(Icons.home),
                   label: const Text('Back to Home'),

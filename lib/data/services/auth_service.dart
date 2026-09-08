@@ -3,7 +3,9 @@
 // SharedPreferences). This file is kept as a thin wrapper for any legacy
 // code that still references AuthService.
 
-import '../services/api_client.dart';
+
+
+import 'api_client.dart';
 
 class AuthService {
   /// Returns true if a JWT token is stored locally.

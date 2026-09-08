@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app_root.dart';
+import '../../components/utils/app_utils.dart';
 import '../providers/auth_provider.dart';
 import 'otpverify_onregister.dart';
 
@@ -19,6 +20,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
+
+  // BUGFIX: mirrors the backend's RegisterRequest rule exactly
+  // (min 8 chars, at least one uppercase, one lowercase, one digit).
+  // The old client-side check only required 6 characters, so users could
+  // fill in a form that looked valid and still get rejected by the
+  // server with a confusing 422 error.
+  static final RegExp _passwordRegex =
+  RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$');
 
   @override
   void dispose() {
@@ -47,6 +56,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
+    if (!AppUtils.isValidEmail(_emailController.text.trim())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid email address'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -57,10 +76,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
-    if (_passwordController.text.length < 6) {
+    if (!_passwordRegex.hasMatch(_passwordController.text)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Password must be at least 6 characters'),
+          content: Text(
+            'Password must be at least 8 characters and include an '
+                'uppercase letter, a lowercase letter, and a number.',
+          ),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -200,7 +222,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: 'Password *',
-                  hintText: 'At least 6 characters',
+                  hintText: 'At least 8 characters, with upper, lower & a number',
                   prefixIcon: const Icon(Icons.lock_outlined),
                   suffixIcon: IconButton(
                     icon: Icon(

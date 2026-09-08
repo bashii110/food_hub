@@ -21,17 +21,27 @@ final cartRepositoryProvider = Provider.family<CartRepository, String>((ref, use
 
 // ── Cart State Notifier ───────────────────────────────────────
 class CartNotifier extends StateNotifier<AsyncValue<List<CartItem>>> {
-  final CartRepository _repository;
+  final CartRepository? _repository;
 
-  CartNotifier(this._repository) : super(const AsyncValue.loading()) {
+  CartNotifier(this._repository)
+      : super(const AsyncValue.loading()) {
     loadCart();
   }
 
+  CartNotifier.empty()
+      : _repository = null,
+        super(const AsyncValue.data([]));
 
   Future<void> loadCart() async {
+    if (_repository == null) {
+      state = const AsyncValue.data([]);
+      return;
+    }
+
     state = const AsyncValue.loading();
+
     try {
-      final items = await _repository.getCartItems();
+      final items = await _repository!.getCartItems();
       state = AsyncValue.data(items);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -39,20 +49,34 @@ class CartNotifier extends StateNotifier<AsyncValue<List<CartItem>>> {
   }
 
   Future<void> addToCart(CartItem item) async {
+    if (_repository == null) return;
+
     try {
-      await _repository.addToCart(item);
+      await _repository!.addToCart(item);
       await loadCart();
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<void> updateQuantity(String foodId, int newQuantity) async {
+  Future<void> updateQuantity(
+      String foodId,
+      int newQuantity,
+      ) async {
+    if (_repository == null) return;
+
     final currentState = state.value;
     if (currentState == null) return;
+
     try {
-      final item = currentState.firstWhere((i) => i.food.id == foodId);
-      await _repository.updateCartItem(item.copyWith(quantity: newQuantity));
+      final item = currentState.firstWhere(
+            (i) => i.food.id == foodId,
+      );
+
+      await _repository!.updateCartItem(
+        item.copyWith(quantity: newQuantity),
+      );
+
       await loadCart();
     } catch (e) {
       rethrow;
@@ -62,9 +86,16 @@ class CartNotifier extends StateNotifier<AsyncValue<List<CartItem>>> {
   Future<void> incrementQuantity(String foodId) async {
     final currentState = state.value;
     if (currentState == null) return;
+
     try {
-      final item = currentState.firstWhere((i) => i.food.id == foodId);
-      await updateQuantity(foodId, item.quantity + 1);
+      final item = currentState.firstWhere(
+            (i) => i.food.id == foodId,
+      );
+
+      await updateQuantity(
+        foodId,
+        item.quantity + 1,
+      );
     } catch (e) {
       rethrow;
     }
@@ -73,10 +104,17 @@ class CartNotifier extends StateNotifier<AsyncValue<List<CartItem>>> {
   Future<void> decrementQuantity(String foodId) async {
     final currentState = state.value;
     if (currentState == null) return;
+
     try {
-      final item = currentState.firstWhere((i) => i.food.id == foodId);
+      final item = currentState.firstWhere(
+            (i) => i.food.id == foodId,
+      );
+
       if (item.quantity > 1) {
-        await updateQuantity(foodId, item.quantity - 1);
+        await updateQuantity(
+          foodId,
+          item.quantity - 1,
+        );
       } else {
         await removeFromCart(foodId);
       }
@@ -86,31 +124,38 @@ class CartNotifier extends StateNotifier<AsyncValue<List<CartItem>>> {
   }
 
   Future<void> removeFromCart(String foodId) async {
-    try {
-      await _repository.removeFromCart(foodId);
-      await loadCart();
-    } catch (e) {
-      rethrow;
-    }
+    if (_repository == null) return;
+
+    await _repository!.removeFromCart(foodId);
+    await loadCart();
   }
 
   Future<void> clearCart() async {
-    try {
-      await _repository.clearCart();
-      await loadCart();
-    } catch (e) {
-      rethrow;
-    }
+    if (_repository == null) return;
+
+    await _repository!.clearCart();
+    await loadCart();
   }
 }
 
 // ── Cart Provider ─────────────────────────────────────────────
-// AFTER:
+
 final cartProvider =
 StateNotifierProvider<CartNotifier, AsyncValue<List<CartItem>>>((ref) {
-  final authState = ref.watch(authProvider).value;
-  final userId = authState?.user?.id.toString() ?? 'guest';
-  final repository = ref.watch(cartRepositoryProvider(userId));
+  final authAsync = ref.watch(authProvider);
+  final authState = authAsync.valueOrNull;
+  final user = authState?.user;
+
+  if (user == null) {
+    return CartNotifier.empty();
+  }
+
+  final userId = user.id.toString();
+
+  final repository = ref.watch(
+    cartRepositoryProvider(userId),
+  );
+
   return CartNotifier(repository);
 });
 

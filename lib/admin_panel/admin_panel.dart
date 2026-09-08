@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
-
-import '../data/services/api_client.dart';
+import 'package:food_hub/data/services/api_client.dart';
+import 'package:food_hub/presentation/providers/auth_provider.dart';
 import '../home/admin/admin_payment_settingscreen.dart';
-import '../presentation/providers/auth_provider.dart';
+
 
 
 /* ══════════════════════════════════════════════════════════
